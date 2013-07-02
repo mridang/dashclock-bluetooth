@@ -1,0 +1,8 @@
+<resources>
+
+    <string name="extension_name">Bluetooth</string>
+    <string name="application_name">Dashclock Bluetooth Extension</string>
+    <string name="extension_info">Displays information about your bluetooth connections.</string>
+    <string name="not_paired">Not paired</string>
+
+</resources>
