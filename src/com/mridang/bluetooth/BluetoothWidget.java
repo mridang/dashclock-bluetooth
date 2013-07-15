@@ -19,12 +19,12 @@ import com.google.android.apps.dashclock.api.ExtensionData;
 public class BluetoothWidget extends DashClockExtension{
 
 	/* This is the instance of the receiver that deals with bluetooth status */
-	private SRChangeReceiver objBluetoothReciver;
+	private ToggleReceiver objBluetoothReciver;
 
 	/*
 	 * This class is the receiver for getting bluetooth toggle events
 	 */
-	private class SRChangeReceiver extends BroadcastReceiver {
+	private class ToggleReceiver extends BroadcastReceiver {
 
 		/*
 		 * @see android.content.BroadcastReceiver#onReceive(android.content.Context, android.content.Intent)
@@ -96,10 +96,12 @@ public class BluetoothWidget extends DashClockExtension{
 
 		}
 
-		objBluetoothReciver = new SRChangeReceiver();
-		registerReceiver(objBluetoothReciver, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
-		registerReceiver(objBluetoothReciver, new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED));
-		registerReceiver(objBluetoothReciver, new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED));
+		IntentFilter itfIntents = new IntentFilter((BluetoothAdapter.ACTION_STATE_CHANGED));
+		itfIntents.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
+		itfIntents.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+		
+		objBluetoothReciver = new ToggleReceiver();
+		registerReceiver(objBluetoothReciver, itfIntents);
 		Log.d("BluetoothWidget", "Registered the status receivers");
 
 	}
