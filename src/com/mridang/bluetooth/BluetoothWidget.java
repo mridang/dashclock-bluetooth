@@ -1,7 +1,11 @@
 package com.mridang.bluetooth;
 
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.provider.Settings;
 import android.util.Log;
 
@@ -12,7 +16,93 @@ import com.google.android.apps.dashclock.api.ExtensionData;
 /*
  * This class is the main class that provides the widget
  */
-public class BluetoothWidget extends DashClockExtension {
+public class BluetoothWidget extends DashClockExtension{
+
+	/* This is the instance of the receiver that deals with bluetooth status */
+	private SRChangeReceiver objBluetoothReciver;
+
+	/*
+	 * This class is the receiver for getting bluetooth toggle events
+	 */
+	private class SRChangeReceiver extends BroadcastReceiver {
+
+		/*
+		 * @see android.content.BroadcastReceiver#onReceive(android.content.Context, android.content.Intent)
+		 */
+		@Override
+		public void onReceive(Context ctxContext, Intent ittIntent) {
+
+			if (ittIntent.getAction().equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
+
+				if (ittIntent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0) == BluetoothAdapter.STATE_ON) {
+
+					Log.v("BluetoothWidget", "Bluetooth enabled");
+					onUpdateData(BluetoothAdapter.STATE_ON);
+					return;
+
+				}
+
+				if (ittIntent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0) == BluetoothAdapter.STATE_OFF) {
+
+					Log.v("BluetoothWidget", "Bluetooth disabled");
+					onUpdateData(BluetoothAdapter.STATE_OFF);
+					return;
+
+				}
+
+			}
+
+			if (ittIntent.getAction().equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
+
+				if (ittIntent.getAction().equals(BluetoothAdapter.STATE_CONNECTED)) {
+
+					Log.v("BluetoothWidget", "Bluetooth connected");
+					onUpdateData(BluetoothAdapter.STATE_CONNECTED);
+					return;
+
+				}
+
+				if (ittIntent.getAction().equals(BluetoothAdapter.STATE_DISCONNECTED)) {
+
+					Log.v("BluetoothWidget", "Bluetooth disconnected");
+					onUpdateData(BluetoothAdapter.STATE_DISCONNECTED);
+					return;
+
+				}
+
+			}
+
+		}
+
+	}
+
+	/*
+	 * @see com.google.android.apps.dashclock.api.DashClockExtension#onInitialize(boolean)
+	 */
+	@Override
+	protected void onInitialize(boolean booReconnect) {
+
+		super.onInitialize(booReconnect);
+
+		if (objBluetoothReciver != null) {
+			try {
+
+				Log.d("BluetoothWidget", "Unregistered any existing status receivers");
+				unregisterReceiver(objBluetoothReciver);
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+		}
+
+		objBluetoothReciver = new SRChangeReceiver();
+		registerReceiver(objBluetoothReciver, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
+		registerReceiver(objBluetoothReciver, new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED));
+		registerReceiver(objBluetoothReciver, new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED));
+		Log.d("BluetoothWidget", "Registered the status receivers");
+
+	}
 
 	/*
 	 * @see com.google.android.apps.dashclock.api.DashClockExtension#onCreate()
@@ -33,8 +123,6 @@ public class BluetoothWidget extends DashClockExtension {
 	@Override
 	protected void onUpdateData(int arg0) {
 
-		setUpdateWhenScreenOn(true);
-
 		Log.d("BluetoothWidget", "Fetching bluetooth connectivity information");
 		ExtensionData edtInformation = new ExtensionData();
 		edtInformation.visible(false);
@@ -48,7 +136,7 @@ public class BluetoothWidget extends DashClockExtension {
 				edtInformation.visible(true);
 				edtInformation.clickIntent(new Intent(Settings.ACTION_BLUETOOTH_SETTINGS));
 				edtInformation.status(BluetoothAdapter.getDefaultAdapter().getName());
-				edtInformation.expandedBody(BluetoothAdapter.getDefaultAdapter().getAddress());
+				edtInformation.expandedBody(getString(arg0 == BluetoothAdapter.STATE_CONNECTED ? R.string.connected : R.string.disconnected));
 
 			} else {
 				Log.d("BluetoothWidget", "Bluetooth is off");

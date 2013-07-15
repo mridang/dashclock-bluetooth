@@ -1,8 +1,9 @@
 <resources>
 
+    <string name="connected">Some device connected</string>
     <string name="extension_name">Bluetooth</string>
     <string name="application_name">Dashclock Bluetooth Extension</string>
     <string name="extension_info">Displays information about your bluetooth connections.</string>
-    <string name="not_paired">Not paired</string>
+    <string name="disconnected">No devices connected</string>
 
 </resources>
