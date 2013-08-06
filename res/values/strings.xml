@@ -1,9 +1,12 @@
 <resources>
 
+    <string name="always">Always show</string>
     <string name="connected">Some device connected</string>
     <string name="extension_name">Bluetooth</string>
+    <string name="preferences_title">Bluetooth Extension Settings</string>
     <string name="application_name">Dashclock Bluetooth Extension</string>
     <string name="extension_info">Displays information about your bluetooth connections.</string>
     <string name="disconnected">No devices connected</string>
+    <string name="summary">Extension will always show even when no devices are connected</string>
 
 </resources>

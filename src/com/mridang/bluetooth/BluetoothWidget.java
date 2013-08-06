@@ -12,6 +12,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.Log;
 
@@ -141,10 +142,12 @@ public class BluetoothWidget extends DashClockExtension{
 			if (BluetoothAdapter.getDefaultAdapter().isEnabled()) {
 
 				Log.d("BluetoothWidget", "Bluetooth is on");
-				edtInformation.visible(true);
+				edtInformation.visible(arg0 == BluetoothAdapter.
+						STATE_CONNECTED ? true : PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("always", true));
 				edtInformation.clickIntent(new Intent(Settings.ACTION_BLUETOOTH_SETTINGS));
 				edtInformation.status(BluetoothAdapter.getDefaultAdapter().getName());
-				edtInformation.expandedBody(getString(arg0 == BluetoothAdapter.STATE_CONNECTED ? R.string.connected : R.string.disconnected));
+				edtInformation.expandedBody(getString(arg0 == BluetoothAdapter.
+						STATE_CONNECTED ? R.string.connected : R.string.disconnected));
 
 			} else {
 				Log.d("BluetoothWidget", "Bluetooth is off");
