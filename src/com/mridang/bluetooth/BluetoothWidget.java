@@ -130,11 +130,11 @@ public class BluetoothWidget extends DashClockExtension{
 	 * (int)
 	 */
 	@Override
-	protected void onUpdateData(int arg0) {
+	protected void onUpdateData(int intReason) {
 
 		Log.d("BluetoothWidget", "Fetching bluetooth connectivity information");
 		ExtensionData edtInformation = new ExtensionData();
-		edtInformation.visible(false);
+		setUpdateWhenScreenOn(false);
 
 		try {
 
@@ -142,11 +142,11 @@ public class BluetoothWidget extends DashClockExtension{
 			if (BluetoothAdapter.getDefaultAdapter().isEnabled()) {
 
 				Log.d("BluetoothWidget", "Bluetooth is on");
-				edtInformation.visible(arg0 == BluetoothAdapter.
+				edtInformation.visible(intReason == BluetoothAdapter.
 						STATE_CONNECTED ? true : PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("always", true));
 				edtInformation.clickIntent(new Intent(Settings.ACTION_BLUETOOTH_SETTINGS));
 				edtInformation.status(BluetoothAdapter.getDefaultAdapter().getName());
-				edtInformation.expandedBody(getString(arg0 == BluetoothAdapter.
+				edtInformation.expandedBody(getString(intReason == BluetoothAdapter.
 						STATE_CONNECTED ? R.string.connected : R.string.disconnected));
 
 			} else {
@@ -188,6 +188,7 @@ public class BluetoothWidget extends DashClockExtension{
 			}
 
 		} catch (Exception e) {
+			edtInformation.visible(false);
 			Log.e("BluetoothWidget", "Encountered an error", e);
 			BugSenseHandler.sendException(e);
 		}
