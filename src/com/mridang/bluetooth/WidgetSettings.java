@@ -3,6 +3,7 @@ package com.mridang.bluetooth;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 
+
 /*
  * This class is the activity which contains the preferences
  */

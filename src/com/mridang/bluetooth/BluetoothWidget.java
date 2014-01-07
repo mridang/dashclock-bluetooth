@@ -8,9 +8,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
@@ -44,7 +44,7 @@ public class BluetoothWidget extends DashClockExtension{
 				if (ittIntent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0) == BluetoothAdapter.STATE_ON) {
 
 					Log.v("BluetoothWidget", "Bluetooth enabled");
-					onUpdateData(BluetoothAdapter.STATE_ON);
+					onUpdateData(-BluetoothAdapter.STATE_ON);
 					return;
 
 				}
@@ -52,7 +52,7 @@ public class BluetoothWidget extends DashClockExtension{
 				if (ittIntent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0) == BluetoothAdapter.STATE_OFF) {
 
 					Log.v("BluetoothWidget", "Bluetooth disabled");
-					onUpdateData(BluetoothAdapter.STATE_OFF);
+					onUpdateData(-BluetoothAdapter.STATE_OFF);
 					return;
 
 				}
@@ -64,7 +64,7 @@ public class BluetoothWidget extends DashClockExtension{
 				if (ittIntent.getAction().equals(BluetoothAdapter.STATE_CONNECTED)) {
 
 					Log.v("BluetoothWidget", "Bluetooth connected");
-					onUpdateData(BluetoothAdapter.STATE_CONNECTED);
+					onUpdateData(-BluetoothAdapter.STATE_CONNECTED);
 					return;
 
 				}
@@ -72,7 +72,7 @@ public class BluetoothWidget extends DashClockExtension{
 				if (ittIntent.getAction().equals(BluetoothAdapter.STATE_DISCONNECTED)) {
 
 					Log.v("BluetoothWidget", "Bluetooth disconnected");
-					onUpdateData(BluetoothAdapter.STATE_DISCONNECTED);
+					onUpdateData(-BluetoothAdapter.STATE_DISCONNECTED);
 					return;
 
 				}
@@ -120,7 +120,7 @@ public class BluetoothWidget extends DashClockExtension{
 
 		super.onCreate();
 		Log.d("BluetoothWidget", "Created");
-		BugSenseHandler.initAndStartSession(this, "17259530");
+		BugSenseHandler.initAndStartSession(this, getString(R.string.bugsense));
 
 	}
 
@@ -142,11 +142,11 @@ public class BluetoothWidget extends DashClockExtension{
 			if (BluetoothAdapter.getDefaultAdapter().isEnabled()) {
 
 				Log.d("BluetoothWidget", "Bluetooth is on");
-				edtInformation.visible(intReason == BluetoothAdapter.
+				edtInformation.visible(intReason == -BluetoothAdapter.
 						STATE_CONNECTED ? true : PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("always", true));
 				edtInformation.clickIntent(new Intent(Settings.ACTION_BLUETOOTH_SETTINGS));
 				edtInformation.status(BluetoothAdapter.getDefaultAdapter().getName());
-				edtInformation.expandedBody(getString(intReason == BluetoothAdapter.
+				edtInformation.expandedBody(getString(intReason == -BluetoothAdapter.
 						STATE_CONNECTED ? R.string.connected : R.string.disconnected));
 
 			} else {
@@ -164,10 +164,13 @@ public class BluetoothWidget extends DashClockExtension{
 				} catch (NameNotFoundException e) {
 
 					Integer intExtensions = 0;
+				    Intent ittFilter = new Intent("com.google.android.apps.dashclock.Extension");
+				    String strPackage;
 
-					for (PackageInfo pkgPackage : mgrPackages.getInstalledPackages(0)) {
+				    for (ResolveInfo info : mgrPackages.queryIntentServices(ittFilter, 0)) {
 
-						intExtensions = intExtensions + (pkgPackage.applicationInfo.packageName.startsWith("com.mridang.") ? 1 : 0); 
+				    	strPackage = info.serviceInfo.applicationInfo.packageName;
+						intExtensions = intExtensions + (strPackage.startsWith("com.mridang.") ? 1 : 0); 
 
 					}
 
