@@ -2,12 +2,15 @@ package com.mridang.bluetooth;
 
 import java.util.Random;
 
+import org.acra.ACRA;
+
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ResolveInfo;
@@ -16,14 +19,13 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.Log;
 
-import com.bugsense.trace.BugSenseHandler;
 import com.google.android.apps.dashclock.api.DashClockExtension;
 import com.google.android.apps.dashclock.api.ExtensionData;
 
 /*
  * This class is the main class that provides the widget
  */
-public class BluetoothWidget extends DashClockExtension{
+public class BluetoothWidget extends DashClockExtension {
 
 	/* This is the instance of the receiver that deals with bluetooth status */
 	private ToggleReceiver objBluetoothReciver;
@@ -34,7 +36,9 @@ public class BluetoothWidget extends DashClockExtension{
 	private class ToggleReceiver extends BroadcastReceiver {
 
 		/*
-		 * @see android.content.BroadcastReceiver#onReceive(android.content.Context, android.content.Intent)
+		 * @see
+		 * android.content.BroadcastReceiver#onReceive(android.content.Context,
+		 * android.content.Intent)
 		 */
 		@Override
 		public void onReceive(Context ctxContext, Intent ittIntent) {
@@ -84,7 +88,9 @@ public class BluetoothWidget extends DashClockExtension{
 	}
 
 	/*
-	 * @see com.google.android.apps.dashclock.api.DashClockExtension#onInitialize(boolean)
+	 * @see
+	 * com.google.android.apps.dashclock.api.DashClockExtension#onInitialize
+	 * (boolean)
 	 */
 	@Override
 	protected void onInitialize(boolean booReconnect) {
@@ -120,7 +126,7 @@ public class BluetoothWidget extends DashClockExtension{
 
 		super.onCreate();
 		Log.d("BluetoothWidget", "Created");
-		BugSenseHandler.initAndStartSession(this, getString(R.string.bugsense));
+		ACRA.init(new AcraApplication(getApplicationContext()));
 
 	}
 
@@ -142,18 +148,19 @@ public class BluetoothWidget extends DashClockExtension{
 			if (BluetoothAdapter.getDefaultAdapter().isEnabled()) {
 
 				Log.d("BluetoothWidget", "Bluetooth is on");
-				edtInformation.visible(intReason == -BluetoothAdapter.
-						STATE_CONNECTED ? true : PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("always", true));
+				edtInformation.visible(intReason == -BluetoothAdapter.STATE_CONNECTED ? true : PreferenceManager
+						.getDefaultSharedPreferences(getApplicationContext()).getBoolean("always", true));
 				edtInformation.clickIntent(new Intent(Settings.ACTION_BLUETOOTH_SETTINGS));
 				edtInformation.status(BluetoothAdapter.getDefaultAdapter().getName());
-				edtInformation.expandedBody(getString(intReason == -BluetoothAdapter.
-						STATE_CONNECTED ? R.string.connected : R.string.disconnected));
+				edtInformation
+						.expandedBody(getString(intReason == -BluetoothAdapter.STATE_CONNECTED ? R.string.connected
+								: R.string.disconnected));
 
 			} else {
 				Log.d("BluetoothWidget", "Bluetooth is off");
 			}
 
-			if (new Random().nextInt(5) == 0) {
+			if (new Random().nextInt(5) == 0 && !(0 != (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE))) {
 
 				PackageManager mgrPackages = getApplicationContext().getPackageManager();
 
@@ -164,22 +171,26 @@ public class BluetoothWidget extends DashClockExtension{
 				} catch (NameNotFoundException e) {
 
 					Integer intExtensions = 0;
-				    Intent ittFilter = new Intent("com.google.android.apps.dashclock.Extension");
-				    String strPackage;
+					Intent ittFilter = new Intent("com.google.android.apps.dashclock.Extension");
+					String strPackage;
 
-				    for (ResolveInfo info : mgrPackages.queryIntentServices(ittFilter, 0)) {
+					for (ResolveInfo info : mgrPackages.queryIntentServices(ittFilter, 0)) {
 
-				    	strPackage = info.serviceInfo.applicationInfo.packageName;
-						intExtensions = intExtensions + (strPackage.startsWith("com.mridang.") ? 1 : 0); 
+						strPackage = info.serviceInfo.applicationInfo.packageName;
+						intExtensions = intExtensions + (strPackage.startsWith("com.mridang.") ? 1 : 0);
 
 					}
 
 					if (intExtensions > 1) {
 
 						edtInformation.visible(true);
-						edtInformation.clickIntent(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("market://details?id=com.mridang.donate")));
+						edtInformation.clickIntent(new Intent(Intent.ACTION_VIEW).setData(Uri
+								.parse("market://details?id=com.mridang.donate")));
 						edtInformation.expandedTitle("Please consider a one time purchase to unlock.");
-						edtInformation.expandedBody("Thank you for using " + intExtensions + " extensions of mine. Click this to make a one-time purchase or use just one extension to make this disappear.");
+						edtInformation
+								.expandedBody("Thank you for using "
+										+ intExtensions
+										+ " extensions of mine. Click this to make a one-time purchase or use just one extension to make this disappear.");
 						setUpdateWhenScreenOn(true);
 
 					}
@@ -193,7 +204,7 @@ public class BluetoothWidget extends DashClockExtension{
 		} catch (Exception e) {
 			edtInformation.visible(false);
 			Log.e("BluetoothWidget", "Encountered an error", e);
-			BugSenseHandler.sendException(e);
+			ACRA.getErrorReporter().handleSilentException(e);
 		}
 
 		edtInformation.icon(R.drawable.ic_dashclock);
@@ -223,7 +234,6 @@ public class BluetoothWidget extends DashClockExtension{
 		}
 
 		Log.d("BluetoothWidget", "Destroyed");
-		BugSenseHandler.closeSession(this);
 
 	}
 
