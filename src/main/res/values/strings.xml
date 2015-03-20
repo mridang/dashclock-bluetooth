@@ -1,12 +1,17 @@
 <resources>
 
     <string name="always">Always show</string>
-    <string name="connected">Some device connected</string>
     <string name="extension_name">Bluetooth</string>
     <string name="preferences_title">Bluetooth Extension Settings</string>
     <string name="application_name">Dashclock Bluetooth Extension</string>
     <string name="extension_info">Displays information about your bluetooth connections.</string>
-    <string name="disconnected">No devices connected</string>
+    <string name="enabled">On</string>
+    <string name="disabled">Off</string>
     <string name="summary">Extension will always show even when no devices are connected</string>
+    <string name="not_connected">No Bluetooth devices connected</string>
+    <string name="device_connected">Bluetooth device connected</string>
+    <string name="visible_as">Device will be visible as "%1$s" when allowed</string>
+    <string name="not_enabled">Bluetooth radio is disabled</string>
+    <string name="tap_enable">Enable Bluetooth to pair and connect devices to "%1$s"</string>
 
 </resources>
