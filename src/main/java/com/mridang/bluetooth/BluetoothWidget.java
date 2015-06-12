@@ -72,6 +72,7 @@ public class BluetoothWidget extends ImprovedExtension {
 			if (bluAdapter != null) {
 
 				Log.d(getTag(), "Checking if the bluetooth radio is enabled");
+				edtInformation.clickIntent(new Intent(Settings.ACTION_BLUETOOTH_SETTINGS));
 				if (bluAdapter.isEnabled()) {
 
 					Log.d(getTag(), "Bluetooth radio is enabled");
@@ -84,7 +85,6 @@ public class BluetoothWidget extends ImprovedExtension {
 					edtInformation.visible(true);
 					edtInformation.status(getString(R.string.enabled));
 					edtInformation.expandedBody(getString(R.string.visible_as, bluAdapter.getName()));
-					edtInformation.clickIntent(new Intent(Settings.ACTION_BLUETOOTH_SETTINGS));
 
 				} else {
 
